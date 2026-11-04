@@ -1,4 +1,5 @@
-# clodo
+<p align="center"><img src="assets/logo.svg" width="128" alt=""></p>
+<h1 align="center">clodo</h1>
 
 Find and resume [Claude Code](https://claude.com/claude-code) sessions.
 
