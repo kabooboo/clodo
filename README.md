@@ -1,5 +1,6 @@
-<p align="center"><img src="assets/logo.svg" width="128" alt=""></p>
+<p align="center"><img src="assets/logo.svg" width="180" alt="clodo, a little terminal on the road with a bindle"></p>
 <h1 align="center">clodo</h1>
+<p align="center"><i>clodo</i> (French slang, n.): a tramp.<br>This one wanders through <code>~/.claude</code> with its bindle and brings back the session you lost.</p>
 
 Find and resume [Claude Code](https://claude.com/claude-code) sessions.
 
