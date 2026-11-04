@@ -1,0 +1,11 @@
+[package]
+name = "clodo"
+version = "0.1.0"
+edition = "2021"
+description = "Browse recent Claude Code sessions with fzf, see what each was about, resume one"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+strip = true
