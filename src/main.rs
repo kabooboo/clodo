@@ -232,18 +232,22 @@ fn cwd_of(s: &Session) -> String {
 }
 
 fn files() -> Vec<PathBuf> {
-    let mut v: Vec<(SystemTime, PathBuf)> =
-        fs::read_dir(Path::new(&home()).join(".claude/projects"))
-            .into_iter()
-            .flatten()
-            .flatten()
-            .filter_map(|d| fs::read_dir(d.path()).ok())
-            .flatten()
-            .flatten()
-            .map(|e| e.path())
-            .filter(|p| p.extension().is_some_and(|x| x == "jsonl"))
-            .filter_map(|p| Some((fs::metadata(&p).ok()?.modified().ok()?, p)))
-            .collect();
+    let mut v: Vec<(SystemTime, PathBuf)> = fs::read_dir(
+        std::env::var_os("CLAUDE_CONFIG_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| Path::new(&home()).join(".claude"))
+            .join("projects"),
+    )
+    .into_iter()
+    .flatten()
+    .flatten()
+    .filter_map(|d| fs::read_dir(d.path()).ok())
+    .flatten()
+    .flatten()
+    .map(|e| e.path())
+    .filter(|p| p.extension().is_some_and(|x| x == "jsonl"))
+    .filter_map(|p| Some((fs::metadata(&p).ok()?.modified().ok()?, p)))
+    .collect();
     v.sort_by_key(|e| std::cmp::Reverse(e.0));
     v.into_iter().map(|(_, p)| p).collect()
 }
@@ -267,12 +271,12 @@ fn row(s: &Session) -> String {
         s.away.clone()
     };
     format!(
-        "{}\t{cwd}\t{:>7}  {C}{:<34}{R}  {Y}{:<24}{R}  {B}{}{R}  {D}{}{R}",
+        "{}\t{cwd}\t{:>7}  {B}{:<36}{R}  {C}{:<26}{R}  {Y}{:<20}{R}  {D}{}{R}",
         s.file.display(),
         ago(s.mtime),
-        short(&cwd, 34),
-        one_line(&s.branch, 24),
-        one_line(&title_of(s), 48),
+        one_line(&title_of(s), 36),
+        short(&cwd, 26),
+        one_line(&s.branch, 20),
         one_line(&what, 400)
     )
 }
@@ -350,8 +354,7 @@ fn preview(file: &str) -> io::Result<String> {
     let mut out = vec![
         format!("{B}{}{R}", title_of(&s)),
         format!(
-            "{D}{} · started {} · active {} · {:.1} MB{R}",
-            s.id,
+            "{D}started {} · active {} · {:.1} MB{R}",
             utc(&s.start),
             ago(s.mtime),
             s.size as f64 / 1e6
@@ -471,6 +474,8 @@ fn pick(query: &str, n: &str) -> io::Result<String> {
             "\t",
             "--with-nth",
             "3..",
+            "--exact",
+            "--no-hscroll",
             "--scheme",
             "history",
             "--layout",
