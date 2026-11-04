@@ -7,6 +7,8 @@ path, git branch and title, and Claude's own recap of what was going on. Describ
 finds the session by meaning, even if you use none of its words. Press enter to `cd` into the session's
 folder and `claude --resume` it.
 
+![clodo demo: semantic search finds the session, ctrl-f filters by word](demo/demo.gif)
+
 ## Install
 
 Needs `fzf` and `claude` on your `PATH`. Prebuilt binaries for macOS and Linux (x86_64, arm64) are on the
@@ -43,7 +45,7 @@ last prompts and Claude's last reply.
 
 ## How it works
 
-Sessions are the JSONL files under `~/.claude/projects/`. The title is the `/rename` name or Claude's
+Sessions are the JSONL files under `~/.claude/projects/` (or `$CLAUDE_CONFIG_DIR/projects/`). The title is the `/rename` name or Claude's
 generated title; the recap is the latest "while you were away" summary, or your last prompt when there is none.
 
 Semantic search sends the title, path, branch, recap and your recent prompts of every session to
