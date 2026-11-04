@@ -9,7 +9,15 @@ folder and `claude --resume` it.
 
 ## Install
 
-Needs `fzf` and `claude` on your `PATH`.
+Needs `fzf` and `claude` on your `PATH`. Prebuilt binaries for macOS and Linux (x86_64, arm64) are on the
+[releases page](https://github.com/kabooboo/clodo/releases):
+
+```sh
+target=aarch64-apple-darwin   # or x86_64-apple-darwin, x86_64-unknown-linux-musl, aarch64-unknown-linux-musl
+curl -fsSL "https://github.com/kabooboo/clodo/releases/latest/download/clodo-$target.tar.gz" | tar -xz -C ~/.local/bin
+```
+
+Or from source:
 
 ```sh
 cargo install --path .
