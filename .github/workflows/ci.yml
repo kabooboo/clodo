@@ -11,10 +11,7 @@ permissions:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - run: rustup component add rustfmt clippy
@@ -27,24 +24,24 @@ jobs:
     strategy:
       matrix:
         include:
-          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest }
-          - { target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm }
-          - { target: aarch64-apple-darwin, os: macos-latest }
-          - { target: x86_64-apple-darwin, os: macos-latest }
+          - { os: ubuntu-latest, targets: x86_64-unknown-linux-musl }
+          - { os: ubuntu-24.04-arm, targets: aarch64-unknown-linux-musl }
+          - { os: macos-latest, targets: aarch64-apple-darwin x86_64-apple-darwin }
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
-    env:
-      ASSET: clodo-${{ matrix.target }}.tar.gz
     steps:
       - uses: actions/checkout@v5
-      - run: rustup target add ${{ matrix.target }}
-      - run: cargo build --release --locked --target ${{ matrix.target }}
-      - run: tar -czf "$ASSET" -C target/${{ matrix.target }}/release clodo
+      - run: |
+          for t in ${{ matrix.targets }}; do
+            rustup target add "$t"
+            cargo build --release --locked --target "$t"
+            tar -czf "clodo-$t.tar.gz" -C "target/$t/release" clodo
+          done
       - if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # all four jobs race to create the release; only the first one succeeds
+          # all build jobs race to create the release; only the first one succeeds
           gh release create "$GITHUB_REF_NAME" --generate-notes || true
-          gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+          gh release upload "$GITHUB_REF_NAME" clodo-*.tar.gz --clobber
